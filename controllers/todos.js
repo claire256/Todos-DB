@@ -1,4 +1,5 @@
-const db = require('./database')
+const db = require('../database')
+
 const addTodo = (req,res) =>{
     const todo = req.body;
     const insertQuery = `insert into todos ( title, description, date)
@@ -38,7 +39,7 @@ const addTodo = (req,res) =>{
       else{
           return res.status(200).send({
              status: 'successful',
-             data: result.rows[0]
+             data: result.rows
           })    
         
       }

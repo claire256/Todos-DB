@@ -3,8 +3,8 @@
   id BIGSERIAL NOT NULL PRIMARY KEY,
   first_name VARCHAR(8) NOT NULL,
   last_name VARCHAR(8) NOT NULL,
-  email VARCHAR(15) NOT NULL,
-  password VARCHAR(15) NOT NULL)`
+  email VARCHAR(50) UNIQUE NOT NULL,
+  password VARCHAR(250) NOT NULL)`
 
  const todosTableQuery = `CREATE TABLE IF NOT EXISTS todos (
      id BIGSERIAL NOT NULL PRIMARY KEY, 

@@ -3,8 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const db = require('./database');
 const port = 3000;
-const Todo = require('./controllers');
-const router = require('./routes')
+const router = require('./routes');
+const bycrypt = require('bcrypt');
 
 app.use(bodyParser.json());
 router(app);
