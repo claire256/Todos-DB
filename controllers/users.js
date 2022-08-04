@@ -70,5 +70,46 @@ const addUser = async (req, res)=>{
     
     // })  
 }
+const loginUser = async (req, res)=>{
+    
+    const email = req.body.email;
+    const password = req.body.password; 
 
-module.exports = addUser;
+    //   try{
+
+      const selectUser = `select * from users where email = $1`
+      const result = await db.query(selectUser, [email])
+        
+      console.log('jkl....', result.rows[0])
+      const hashedPassword = result.rows[0].password       
+      
+      const comparedPassword = await bcrypt.compare(password, hashedPassword) 
+         console.log('ccccccccccccc', comparedPassword)
+      if(comparedPassword == true) {  
+         return res.status(200).send({
+                status: 'login successful',
+                data: result.rows
+            })
+       }
+       else{
+        return res.status(401).send({
+            status: 'ok',
+            data:  'Wrong password or email'
+        })
+       }
+    //   }
+    //    catch (err) {
+    //         console.log(err)
+    //         return res.status(500).send({
+    //             status:'internal server error',
+    //             data: err.message
+    //         })
+                
+    // }
+}  
+
+
+module.exports = {
+    addUser,
+    loginUser
+} 

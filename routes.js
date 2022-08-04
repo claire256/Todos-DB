@@ -1,5 +1,5 @@
 const Todo = require('./controllers/todos');
-const addUser = require('./controllers/users')
+const User = require('./controllers/users')
 const db = require('./database');
 const router = (app) => {
     
@@ -8,8 +8,9 @@ const router = (app) => {
     app.get('/todos/:id', Todo.getTodo);
     app.put('/todos/:id', Todo.editTodo );
     app.delete('/todos/:id', Todo.deleteTodo);
-    app.post('/users', addUser);
-     
+    app.post('/users', User.addUser);
+    app.post('/login', User.loginUser)
+    
 }
 
 module.exports = router;
