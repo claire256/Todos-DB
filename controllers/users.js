@@ -1,5 +1,7 @@
+
 const bcrypt = require('bcrypt');
-const db = require('../database')
+const jwt = require('jsonwebtoken');
+const db = require('../database');
 
 const addUser = async (req, res)=>{
     const user = req.body;
@@ -75,39 +77,50 @@ const loginUser = async (req, res)=>{
     const email = req.body.email;
     const password = req.body.password; 
 
-    //   try{
+       try{
 
       const selectUser = `select * from users where email = $1`
       const result = await db.query(selectUser, [email])
         
-      console.log('jkl....', result.rows[0])
+      console.log('jkl....', result)
+
       const hashedPassword = result.rows[0].password       
-      
+         console.log('rrrrrrrrrrrr', result.rows)
       const comparedPassword = await bcrypt.compare(password, hashedPassword) 
          console.log('ccccccccccccc', comparedPassword)
-      if(comparedPassword == true) {  
-         return res.status(200).send({
-                status: 'login successful',
-                data: result.rows
+      
+         if(comparedPassword == true) { 
+        const id = result.rows[0].id
+        console.log('pppppp',process.env.SECRET_KEY)
+        const accessToken = jwt.sign({id}, process.env.SECRET_KEY) 
+        
+            return  res.status(200).send({
+                first_name: result.rows[0].first_name,
+                accessToken: accessToken
             })
        }
        else{
         return res.status(401).send({
-            status: 'ok',
+            status: 'failed',
             data:  'Wrong password or email'
         })
        }
-    //   }
-    //    catch (err) {
-    //         console.log(err)
-    //         return res.status(500).send({
-    //             status:'internal server error',
-    //             data: err.message
-    //         })
-                
-    // }
+     }
+       catch(err){
+           console.log('eroooooo', err.message)
+           return res.status(400).send({
+               status: 'failed',
+               data: 'authetication failed'
+           })
+       }
+    //    const accessToken = jwt.sign({email}, process.env.ACCESS_TOKEN_SECRET)
+    //          res.json({accessToken: accessToken})
+
 }  
 
+function authenticateToken(req, res, next){
+    
+}
 
 module.exports = {
     addUser,
