@@ -118,11 +118,10 @@ const loginUser = async (req, res)=>{
 
 }  
 
-function authenticateToken(req, res, next){
-    
-}
+
 
 module.exports = {
     addUser,
-    loginUser
+    loginUser,
+    
 } 

@@ -1,10 +1,12 @@
-const db = require('../database')
+const db = require('../database');
+const { getTokenData } = require('../utils');
 
 const addTodo = (req,res) =>{
     const todo = req.body;
-    const insertQuery = `insert into todos ( title, description, date)
-                     values($1, $2, $3) RETURNING *`
-      const values = [todo.title, todo.description, todo.date]
+    const tokenData = getTokenData(req)
+    const insertQuery = `insert into todos ( title, description, date, users_id)
+                     values($1, $2, $3, $4) RETURNING *`
+      const values = [todo.title, todo.description, todo.date, tokenData.id]
       
       db.query(insertQuery , values, (err , result)=>{
 
@@ -48,7 +50,10 @@ const addTodo = (req,res) =>{
 }
 
 const getAllTodos = (req, res)=>{
-    db.query(`select * from todos`, (err, result)=>{
+    
+    const tokenData = getTokenData(req);
+    values = [tokenData.id]
+    db.query(`select * from todos where users_id = $1`, values, (err, result)=>{
       if(err) {
         return  res.status(400).send({
             status: 'fail',
@@ -67,17 +72,26 @@ const getAllTodos = (req, res)=>{
 }
 
 const getTodo = (req,res)=> {
-    
-const values = [req.params.id]
 
-    db.query(`select * from todos where id = $1`, values, (err, result)=>{
+const tokenData = getTokenData(req)
+const values = [req.params.id, tokenData.id]
+
+    db.query(`select * from todos where id=$1 and users_id=$2`, values, (err, result)=>{
+   
         if(err) {
             return  res.status(400).send({
                 status: 'fail',
                 data: err.message
             })
+            
         }
-    
+        if(result.rows.length<1){
+            console.log('rrrrrrrrr', result.rows)
+            return res.status(200).send({
+                status: 'Not Found'
+            })
+        }
+        
         else {
             return res.status(200).send({
                status: 'successful',
@@ -89,18 +103,19 @@ const values = [req.params.id]
 }
 
 const editTodo = (req, res)=> {
+    const tokenData = getTokenData(req);
     const todo = req.body;
-                     
-     const values = [todo.title, todo.description, todo.date]
+    const values = [todo.title, todo.description, todo.date, req.params.id, tokenData.id]
 
     const editQuery = `update todos set
      title = $1, 
      description = $2, 
      date = $3
-     where id = '${req.params.id}' `
+     where id = $4 and users_id = $5 RETURNING *`
 
       db.query(editQuery, values, (err, result)=> {
-          if(err){
+        console.log('hhhhhh', result.rows)
+        if(err){
         return res.status(400).send({
              status: 'edit failed',
              data: err.message
@@ -109,17 +124,18 @@ const editTodo = (req, res)=> {
 
          else{
              return res.status(200).send({
-                 status: 'edit successful'
+                 status: 'edit successful',
+                 data: result.rows
              })
          }
         })
     }
 
 const deleteTodo = (req, res) => {
-     
-    const values = [req.params.id]
+    const tokenData = getTokenData(req) 
+    const values = [req.params.id, tokenData.id]
 
-    db.query(`delete from todos where id = $1`, values, (err, result)=> {
+    db.query(`delete from todos where id = $1 and users_id = $2`, values, (err, result)=> {
       
     if(err) {
     return  res.status(400).send({
