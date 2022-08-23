@@ -1,0 +1,8 @@
+- all fix trim errors when field is not passed
+- validate email
+- login failur status code should be not authorized code (401)
+- validate editing a todo
+- edit and delete todo should return not authorized error not owner of todo
+- return deleted to do on delete
+- remove console.logs 
+- do not send array in response for delete/update/vi                                                                                                                                                              

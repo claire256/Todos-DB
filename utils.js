@@ -5,23 +5,28 @@ const getTokenData = (req) =>{
 
     const newToken = token.replace("Bearer ", "");
     const result = jwt.verify(newToken, process.env.SECRET_KEY);
-    console.log('fffffff', result)
+
     return result
 }
 
 const verifyToken = (req, res, next) =>{
     const token = req.headers.authorization;
+    if(!token){
+        return res.status(401).send({
+            login: false,
+            messsage: 'Missing authorization token'
+        })
+    }
     const newToken = token.replace("Bearer ", "");
-    console.log('jjjjjj', newToken)
   
     const verify = jwt.verify(newToken, process.env.SECRET_KEY);
-    console.log('vvvvv', verify);
+    
     if(verify.id){
     
           next();
    }
    else{
-       return res.json({
+       return res.json.status(401).send({
            login: false,
            data: 'fail'
        })

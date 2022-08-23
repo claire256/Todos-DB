@@ -10,37 +10,37 @@ const addTodo = (req,res) =>{
       
       db.query(insertQuery , values, (err , result)=>{
 
-        if(todo.title.trim().length<1){
+        if(todo.title && todo.title.trim().length<1){
         
             return res.status(201).send({
-                status: 'fill title'
+                message: 'fill title'
                  
             })
          }
          
-         if(todo.description.trim().length<1){
+         if(todo.description && todo.description.trim().length<1){
             
             return res.status(201).send({
-                status: 'fill description'
+                message: 'fill description'
             })
          }
          
-         if(todo.date.trim().length<1){
+         if(todo.date && todo.date.trim().length<1){
             
             return res.status(201).send({
-                status:'fill date'
+                message:'fill date'
             })
          }
      
       if(err){
           return res.status(400).send({
-              status: 'fail',
+              message: 'fail',
               data: err.message
           })
       }
       else{
           return res.status(200).send({
-             status: 'successful',
+             message: 'successful',
              data: result.rows
           })    
         
@@ -56,14 +56,14 @@ const getAllTodos = (req, res)=>{
     db.query(`select * from todos where users_id = $1`, values, (err, result)=>{
       if(err) {
         return  res.status(400).send({
-            status: 'fail',
+            message: 'fail',
             data: err.message
         })
     }
 
     else {
         return res.status(200).send({
-           status: 'successful',
+           message: 'successful',
             data: result.rows
         })
     }
@@ -80,21 +80,20 @@ const values = [req.params.id, tokenData.id]
    
         if(err) {
             return  res.status(400).send({
-                status: 'fail',
+                message: 'fail',
                 data: err.message
             })
             
         }
         if(result.rows.length<1){
-            console.log('rrrrrrrrr', result.rows)
             return res.status(200).send({
-                status: 'Not Found'
+                message: 'Not Found'
             })
         }
         
         else {
             return res.status(200).send({
-               status: 'successful',
+               message: 'successful',
                 data: result.rows
             })
         }
@@ -114,18 +113,18 @@ const editTodo = (req, res)=> {
      where id = $4 and users_id = $5 RETURNING *`
 
       db.query(editQuery, values, (err, result)=> {
-        console.log('hhhhhh', result.rows)
+    
         if(err){
-        return res.status(400).send({
-             status: 'edit failed',
+        return res.status(401).send({
+             message: 'Not authorised',
              data: err.message
           })
          }
 
          else{
              return res.status(200).send({
-                 status: 'edit successful',
-                 data: result.rows
+                 message: 'edit successful',
+                 data: result.rows[0]
              })
          }
         })
@@ -138,16 +137,16 @@ const deleteTodo = (req, res) => {
     db.query(`delete from todos where id = $1 and users_id = $2`, values, (err, result)=> {
       
     if(err) {
-    return  res.status(400).send({
-        status: 'fail',
+    return  res.status(401).send({
+        message: 'Not Authorised',
         data: err.message
     })
    }
 
    else {
     return res.status(200).send({
-       status: 'successful',
-        data: result.rows
+       message: 'Deleted Todo',
+        data: result.rows[0]
     })
    }
 
