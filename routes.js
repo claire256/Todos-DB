@@ -11,8 +11,8 @@ const router = (app) => {
     app.delete('/todos/:id', verifyToken, Todo.deleteTodo);
     app.post('/signup', User.addUser);
     app.post('/login', User.loginUser);
-    
-    
+    app.get('/users/:id', verifyToken, User.getUser)
+        
 }
 
 module.exports = router;

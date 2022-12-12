@@ -7,7 +7,7 @@ const addTodo = (req,res) =>{
     const insertQuery = `insert into todos ( title, description, date, users_id)
                      values($1, $2, $3, $4) RETURNING *`
       const values = [todo.title, todo.description, todo.date, tokenData.id]
-      
+    //   console.log('date', date)
       db.query(insertQuery , values, (err , result)=>{
 
         if(todo.title && todo.title.trim().length<1){
@@ -17,7 +17,6 @@ const addTodo = (req,res) =>{
                  
             })
          }
-         
          if(todo.description && todo.description.trim().length<1){
             
             return res.status(201).send({
@@ -39,13 +38,13 @@ const addTodo = (req,res) =>{
           })
       }
       else{
+        console.log('date', todo.date)
           return res.status(200).send({
              message: 'successful',
              data: result.rows
           })    
         
       }
-
       })               
 }
 
@@ -54,21 +53,21 @@ const getAllTodos = (req, res)=>{
     const tokenData = getTokenData(req);
     values = [tokenData.id]
     db.query(`select * from todos where users_id = $1`, values, (err, result)=>{
+        // console.log('date', date)
       if(err) {
         return  res.status(400).send({
             message: 'fail',
             data: err.message
         })
     }
-
     else {
+        // console.log('alll',result.rows)
         return res.status(200).send({
            message: 'successful',
             data: result.rows
         })
     }
     })
-
 }
 
 const getTodo = (req,res)=> {
@@ -90,14 +89,13 @@ const values = [req.params.id, tokenData.id]
                 message: 'Not Found'
             })
         }
-        
         else {
+            // console.log('ggg',result.rows)
             return res.status(200).send({
                message: 'successful',
                 data: result.rows
             })
         }
-        
     })
 }
 
@@ -134,7 +132,7 @@ const deleteTodo = (req, res) => {
     const tokenData = getTokenData(req) 
     const values = [req.params.id, tokenData.id]
 
-    db.query(`delete from todos where id = $1 and users_id = $2`, values, (err, result)=> {
+    db.query(`delete from todos where id = $1 and users_id = $2 RETURNING *`, values, (err, result)=> {
       
     if(err) {
     return  res.status(401).send({
@@ -144,12 +142,11 @@ const deleteTodo = (req, res) => {
    }
 
    else {
-    return res.status(200).send({
+     return res.status(200).send({
        message: 'Deleted Todo',
         data: result.rows[0]
     })
    }
-
   })
 
 }

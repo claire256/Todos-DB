@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../database');
 const validator = require('email-validator');
+const { getTokenData } = require('../utils');
 
 
 const addUser = async (req, res)=>{
@@ -14,7 +15,6 @@ const addUser = async (req, res)=>{
         return res.status(400).send({
              message: 'fill first name'
          })
-
      }
      if(user.last_name && user.last_name.trim().length < 1){
       return res.status(400).send({
@@ -31,21 +31,18 @@ const addUser = async (req, res)=>{
           message: 'fill password'
       })
     }
-    
     const email = req.body.email;
     
     const isValidEmail = validator.validate(email);
-    
     if(!isValidEmail){
         return res.status(400).send({
             Message: 'Email invalid'
             
         })
      }
-    
     try {
         const hashed = await bcrypt.hash(user.password, 10)
-       hashedPassword = hashed
+        hashedPassword = hashed
 
     } catch (err) {
         return res.status(400).send({
@@ -53,13 +50,12 @@ const addUser = async (req, res)=>{
             data: err.message
          }) 
     }
-
     try {
         const values = [user.first_name, user.last_name, user.email, hashedPassword]
 
         const result =  await db.query(insertQuery, values)
         delete result.rows[0].password
-        
+        console.log('uuu', result.rows[0])
         return res.status(200).send({
             message: 'Added user successfully',
             data: result.rows[0]
@@ -70,23 +66,9 @@ const addUser = async (req, res)=>{
             data: err.message
          })
     }
-
-    // db.query(insertQuery, values, (err, result) =>{
-       
-    //    if(err){
-       
-    //     }
-    //    else{
-    //      return res.status(200).send({
-    //            status: 'Added user successfully',
-    //            data: result.rows
-    //        })
-    //    }
-    
-    // })  
 }
+
 const loginUser = async (req, res)=>{
-    
     const email = req.body.email;
     const password = req.body.password; 
 
@@ -96,7 +78,6 @@ const loginUser = async (req, res)=>{
         
         })
     } 
-    
     if(password && password.trim().length<1) {
         return res.status(200).send({
                message: 'fill password'
@@ -134,15 +115,42 @@ const loginUser = async (req, res)=>{
                data: err.message
            })
        }
-    //    const accessToken = jwt.sign({email}, process.env.ACCESS_TOKEN_SECRET)
-    //          res.json({accessToken: accessToken})
 
-}  
+} 
 
+const getUser = (req,res)=>{
+  
+ const values =[req.params.id] 
+ 
+ db.query(`select * from users where id=$1`, values, (err, result)=>{
+     if(err){
+         console.log('err', err.message)
+         return res.status(400).send({
+             message : 'fail',
+             data: err.message
+         })
+   }
+    if(result.rows.length<1){
+        return res.status(200).send({
+            message : 'Not found'
+        })
+    }
+    else{
+        console.log('result', result.rows)
+        delete result.rows[0].password
+        return res.status(200).send({
+            message: 'Successful',
+            data: result.rows
+        })
+    }
+ })
+
+}
 
 
 module.exports = {
     addUser,
     loginUser,
+    getUser
     
 } 

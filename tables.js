@@ -1,15 +1,15 @@
  const db = require('./database');
  const usersTableQuery = `CREATE TABLE IF NOT EXISTS users(
   id BIGSERIAL NOT NULL PRIMARY KEY,
-  first_name VARCHAR(8) NOT NULL,
-  last_name VARCHAR(8) NOT NULL,
+  first_name VARCHAR(15) NOT NULL,
+  last_name VARCHAR(15) NOT NULL,
   email VARCHAR(50) UNIQUE NOT NULL,
   password VARCHAR(250) NOT NULL)`
 
  const todosTableQuery = `CREATE TABLE IF NOT EXISTS todos (
      id BIGSERIAL NOT NULL PRIMARY KEY, 
      title VARCHAR(10) NOT NULL, 
-     description VARCHAR(15),
+     description VARCHAR(10),
      date DATE NOT NULL,
      users_id BIGINT REFERENCES users(id))`
   
