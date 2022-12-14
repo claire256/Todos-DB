@@ -12,6 +12,7 @@ const router = (app) => {
     app.post('/signup', User.addUser);
     app.post('/login', User.loginUser);
     app.get('/users/:id', verifyToken, User.getUser)
+    app.put('/users/:id', verifyToken, User.editUser)
         
 }
 

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const getTokenData = (req) =>{ 
     const token = req.headers.authorization;
-
+    console.log('token', token)
     const newToken = token.replace("Bearer ", "");
     const result = jwt.verify(newToken, process.env.SECRET_KEY);
 

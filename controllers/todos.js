@@ -140,7 +140,6 @@ const deleteTodo = (req, res) => {
         data: err.message
     })
    }
-
    else {
      return res.status(200).send({
        message: 'Deleted Todo',

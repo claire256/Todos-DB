@@ -119,12 +119,10 @@ const loginUser = async (req, res)=>{
 } 
 
 const getUser = (req,res)=>{
-  
  const values =[req.params.id] 
  
  db.query(`select * from users where id=$1`, values, (err, result)=>{
      if(err){
-         console.log('err', err.message)
          return res.status(400).send({
              message : 'fail',
              data: err.message
@@ -136,21 +134,40 @@ const getUser = (req,res)=>{
         })
     }
     else{
-        console.log('result', result.rows)
         delete result.rows[0].password
         return res.status(200).send({
             message: 'Successful',
-            data: result.rows
+            data: result.rows[0]
         })
     }
  })
-
 }
-
+const editUser = (req,res)=>{
+   const user = req.body
+   const values =[user.first_name, user.last_name, req.params.id]
+   const editQuery = `update users set
+   first_name =$1, last_name = $2 where id = $3 RETURNING *`
+   
+   db.query(editQuery, values, (err, result)=>{
+   if(err){
+       return res.status(401).send({
+           message: 'Not Authorised',
+           data: err.message
+       })
+   }
+   else{
+       return res.status(200).send({
+           message: 'edit successful',
+           data: result.rows[0]
+       })
+   }
+})
+}
 
 module.exports = {
     addUser,
     loginUser,
-    getUser
+    getUser,
+    editUser
     
 } 
